@@ -5,6 +5,7 @@
 #include <functional>
 #include <iostream>
 #include <sstream>
+#include <memory>
 
 namespace hal {
   namespace port {
@@ -51,48 +52,21 @@ namespace hal {
       unsigned m_physic_port;
 
       public:
-        Port() {
-          static int i = 1;
-          m_physic_port = i++;
-        }
-        operator unsigned() { return m_physic_port; };
+        Port();
 
-        unsigned GetPhysicPort() {
-          return m_physic_port;
-        }
+        operator unsigned();
 
-        unsigned GetLogicPort() {
-          return m_logic_port;
-        }
+        unsigned GetPhysicPort();
+        unsigned GetLogicPort();
 
-        std::tuple<Speed, Duplex, State> GetStatus() {
-          return std::make_tuple(Speed::E_SPEED_100M, Duplex::E_DUPLEX_FULL, State::E_UP);
-        }
+        std::tuple<Speed, Duplex, State> GetStatus();
 
-        void SetSpeed(Speed speed, Duplex duplex) {
-          m_speed = speed;
-          m_duplex = duplex;
-        }
+        void SetSpeed(Speed speed, Duplex duplex);
+        void SetAdminMode(State state);
 
-        void SetAdminMode(State state) {
-          m_state = state;
-        }
-
-        void Add(const Ids& ports) {
-          for (auto p : ports) {
-            std::cerr << __PRETTY_FUNCTION__ << ": " << p->m_physic_port << '\n';
-          }
-        }
-
-        void Sub(const Ids& ports) {
-          for (auto p : ports) {
-            std::cerr << __PRETTY_FUNCTION__ << ": " << p->m_physic_port << '\n';
-          }
-        }
-
-        Ids Get() {
-
-        }
+        void Add(const Ids& ports);
+        void Sub(const Ids& ports);
+        Ids Get();
     };
   }
 }

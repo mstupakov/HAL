@@ -2,13 +2,14 @@
 #define DUMMY_H__
 
 #include "gboard.h"
+#include "stub.h"
 
 #include <iostream>
 
 namespace hal {
   namespace bsp {
 
-    struct Dummy : GBoard {
+    struct Dummy : GBoardImp<Stub> {
       Dummy() {
         std::cerr << __PRETTY_FUNCTION__ << '\n';
       }
