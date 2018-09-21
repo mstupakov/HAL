@@ -17,6 +17,10 @@ namespace hal {
      ~Dummy() {
         std::cerr << __PRETTY_FUNCTION__ << '\n';
       }
+
+      void Init() {
+        GBoardImp<Stub>::Init({ {1}, {2}, {3}, {4}, {5} });
+      }
     };
   }
 }

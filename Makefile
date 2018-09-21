@@ -10,10 +10,10 @@ all: example/main.o              \
      source/export/iboard.o      \
      source/export/iport.o       \
      source/export/common/port.o
-	g++ -ggdb3 ${INCLUDE_DIR} $^ -o $@
+	g++ -ggdb3 -std=c++1z ${INCLUDE_DIR} $^ -o $@
 
 %.o: %.cpp
-	g++ -ggdb3 -c ${INCLUDE_DIR} $^ -o $@
+	g++ -ggdb3 -std=c++1z -c ${INCLUDE_DIR} $^ -o $@
 
 clean:
 	rm -rf all main.o

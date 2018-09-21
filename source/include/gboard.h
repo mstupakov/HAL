@@ -1,22 +1,15 @@
 #ifndef GBOARD_H__
 #define GBOARD_H__
 
+#include "rc.h"
+#include "port.h"
+#include "topology.h"
+
 #include <type_traits>
 #include <memory>
 
-#include "rc.h"
-#include "port.h"
-
 namespace hal {
   struct GBoard {
-    virtual void Init() = 0;
-
-    virtual void SetPortAdmin() = 0;
-    virtual void SetPortSpeed() = 0;
-    virtual void SetPortDuplex() = 0;
-    virtual void SetPortAutoNeg() = 0;
-    virtual void SetPortSteering() = 0;
-
     virtual void Apply(port::Port) = 0;
   };
 
@@ -26,15 +19,13 @@ namespace hal {
 
     GBoardImp() : m_switch(this) {}
 
-    virtual void Init() override {}
+    virtual void Init(const Topology &t) {
+      m_switch.Init(t);
+    }
 
-    virtual void SetPortAdmin() override {}
-    virtual void SetPortSpeed() override {}
-    virtual void SetPortDuplex() override {}
-    virtual void SetPortAutoNeg() override {}
-    virtual void SetPortSteering() override {}
-
-    virtual void Apply(port::Port) override {}
+    virtual void Apply(port::Port port) override {
+      m_switch.Apply(port);
+    }
   };
 }
 
