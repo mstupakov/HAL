@@ -20,10 +20,16 @@ int main(int argc, char *argv[]) {
     hal::UIBoard board = hal::IBoard::GetBoard(id);
     hal::UIPort ports = board->GetIPort();
 
-    ports->Subscribe([](hal::port::Event, hal::port::Ids){});
+    ports->Subscribe([](hal::port::Event e, const hal::port::Ids &ports) {
+      for (auto p : ports) {
+        std::cerr << __PRETTY_FUNCTION__ << ": Event: " << e << *p << '\n';
+      }
+    });
+
+    board->Init();
 
     for (auto p : *ports) {
-      std::cerr << __PRETTY_FUNCTION__ << ": " << static_cast<int> (*p) << '\n';
+      std::cerr << __PRETTY_FUNCTION__ << ": " << *p << '\n';
     }
 
     auto p0 = ports->GetPort(1);
@@ -37,9 +43,18 @@ int main(int argc, char *argv[]) {
 
     p0->Add({p1, p2});
     p0->Sub({p1, p2});
+    p0->Add({p1, p1, p1});
+
+    auto to_ports = p0->Get();
+    for (auto p : to_ports) {
+      std::cerr << __PRETTY_FUNCTION__ << " == : " << p->GetLogicPort() << '\n';
+    }
 
     auto [speed, duplex, state] = p0->GetStatus();
+    p1->SetSpeed(speed, duplex);
+    p1->SetAdminMode(state);
 
+    std::cerr << *p0 << '\n';
     auto p10 = ports->GetPort(10);
   } catch (hal::Exception &e) {
     std::cerr << "Error: " << e.what() << '\n';

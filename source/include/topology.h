@@ -5,7 +5,8 @@
 
 namespace hal {
   struct PortCfg {
-    unsigned port;
+    unsigned physic_port;
+    unsigned logic_port;
   };
 
   using Topology = std::list<PortCfg>;

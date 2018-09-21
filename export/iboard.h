@@ -12,6 +12,8 @@ namespace hal {
   struct IPort; using UIPort = std::shared_ptr<IPort>;
 
   struct IBoard {
+    void Init();
+
     UIPort GetIPort();
     static UIBoard GetBoard(BoardId);
 

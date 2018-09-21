@@ -4,32 +4,33 @@
 #include <functional>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 namespace hal {
   namespace port {
 
-    Port::Port() 
+    Port::Port(unsigned physic_port, unsigned logic_port)
       : m_speed(Speed::E_SPEED_100M),
         m_duplex(Duplex::E_DUPLEX_FULL),
         m_state(State::E_UP) {
 
-      static int i = 1;
-      m_physic_port = i++;
+      m_physic_port = physic_port;
+      m_logic_port = logic_port;
     }
 
-    Port::operator unsigned() {
+    Port::operator unsigned() const {
       return m_physic_port;
     };
 
-    unsigned Port::GetPhysicPort() {
+    unsigned Port::GetPhysicPort() const {
       return m_physic_port;
     }
 
-    unsigned Port::GetLogicPort() {
+    unsigned Port::GetLogicPort() const {
       return m_logic_port;
     }
 
-    std::tuple<Speed, Duplex, State> Port::GetStatus() {
+    std::tuple<Speed, Duplex, State> Port::GetStatus() const {
       return std::make_tuple(m_speed, m_duplex, m_state);
     }
 
@@ -44,18 +45,36 @@ namespace hal {
 
     void Port::Add(const Ids& ports) {
       for (auto p : ports) {
-        std::cerr << __PRETTY_FUNCTION__ << ": " << p->m_physic_port << '\n';
+        std::cerr << __PRETTY_FUNCTION__ << " ++ : " << p->m_physic_port << '\n';
+      }
+
+      Ids ids;
+      std::merge(std::begin(m_to_ports), std::end(m_to_ports),
+          std::begin(ports), std::end(ports), std::inserter(ids, ids.begin()));
+      m_to_ports = ids;
+
+      for (auto p : m_to_ports) {
+        std::cerr << __PRETTY_FUNCTION__ << " == : " << p->m_physic_port << '\n';
       }
     }
 
     void Port::Sub(const Ids& ports) {
       for (auto p : ports) {
-        std::cerr << __PRETTY_FUNCTION__ << ": " << p->m_physic_port << '\n';
+        std::cerr << __PRETTY_FUNCTION__ << " -- : " << p->m_physic_port << '\n';
+      }
+
+      Ids ids;
+      std::set_difference(std::begin(m_to_ports), std::end(m_to_ports),
+          std::begin(ports), std::end(ports), std::inserter(ids, ids.begin()));
+      m_to_ports = ids;
+
+      for (auto p : m_to_ports) {
+        std::cerr << __PRETTY_FUNCTION__ << " == : " << p->m_physic_port << '\n';
       }
     }
 
-    Ids Port::Get() {
-
+    Ids Port::Get() const {
+      return m_to_ports;
     }
   }
 }

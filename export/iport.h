@@ -10,23 +10,14 @@
 
 namespace hal {
   class IPort {
-    public:
     std::shared_ptr<GBoard> m_board;
-    //std::list<std::shared_ptr<port::Port>> m_ports = {
-    //                                  std::make_shared<port::Port>(), 
-    //                                  std::make_shared<port::Port>(),
-    //                                  std::make_shared<port::Port>()
-    std::list<std::shared_ptr<port::Port>> m_ports = {
-                                      std::make_shared<port::Port>(), 
-                                      std::make_shared<port::Port>(),
-                                      std::make_shared<port::Port>()
-    };
+    std::list<std::shared_ptr<port::Port>> m_ports;
 
     public:
       IPort(std::shared_ptr<GBoard>);
 
       void Subscribe(port::Notify);
-      std::shared_ptr<port::Port> GetPort(unsigned port);
+      std::shared_ptr<port::Port> GetPort(unsigned);
 
       decltype(m_ports)::iterator begin();
       decltype(m_ports)::iterator end();

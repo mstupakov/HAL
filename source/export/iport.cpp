@@ -10,10 +10,16 @@ namespace hal {
   IPort::IPort(std::shared_ptr<GBoard> board)
     :  m_board(board) {
     std::cerr << __PRETTY_FUNCTION__ << '\n';
+    m_board->Subscribe([this](port::Event e, const port::Ids &ports) {
+      if (e == port::Event::E_CREATE) {
+        std::for_each(std::begin(ports), std::end(ports),
+            [this](auto p) { this->m_ports.push_back(p); });
+      }
+    });
   }
 
-  void IPort::Subscribe(port::Notify) {
-
+  void IPort::Subscribe(port::Notify notify) {
+    m_board->Subscribe(notify);
   }
 
   std::shared_ptr<port::Port> IPort::GetPort(unsigned port) {

@@ -28,6 +28,11 @@ namespace hal {
 
   IBoard::~IBoard() {}
 
+  void IBoard::Init() {
+    std::cerr << __PRETTY_FUNCTION__ << '\n';
+    m_pimp->m_board->Init();
+  }
+
   UIPort IBoard::GetIPort() {
     std::cerr << __PRETTY_FUNCTION__ << '\n';
     return std::make_shared<IPort>(m_pimp->m_board);
