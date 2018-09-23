@@ -19,7 +19,7 @@ namespace hal {
     protected:
       port::Port CreatePort(unsigned physic_port,
           unsigned logic_port) {
-        return port::Port(physic_port, logic_port);
+        return port::Port(this, physic_port, logic_port);
       }
   };
 

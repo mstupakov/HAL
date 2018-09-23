@@ -48,6 +48,7 @@ namespace hal {
 
     class Port {
       friend GBoard;
+      GBoard *m_board;
 
       Ids m_to_ports;
 
@@ -58,7 +59,7 @@ namespace hal {
       unsigned m_logic_port;
       unsigned m_physic_port;
 
-      Port(unsigned, unsigned);
+      Port(GBoard*, unsigned, unsigned);
 
       public:
         operator unsigned() const;

@@ -1,11 +1,11 @@
 #ifndef IBOARD_H__
 #define IBOARD_H__
 
-#include <memory>
-
 #include "common/common.h"
 #include "common/board.h"
 #include "iport.h"
+
+#include <memory>
 
 namespace hal {
   struct IBoard; using UIBoard = std::unique_ptr<IBoard>;

@@ -1,4 +1,5 @@
 #include "port.h"
+#include "gboard.h"
 
 #include <list>
 #include <functional>
@@ -9,8 +10,10 @@
 namespace hal {
   namespace port {
 
-    Port::Port(unsigned physic_port, unsigned logic_port)
-      : m_speed(Speed::E_SPEED_100M),
+    Port::Port(GBoard *board,
+        unsigned physic_port, unsigned logic_port)
+      : m_board(board),
+        m_speed(Speed::E_SPEED_100M),
         m_duplex(Duplex::E_DUPLEX_FULL),
         m_state(State::E_UP) {
 
@@ -37,10 +40,13 @@ namespace hal {
     void Port::SetSpeed(Speed speed, Duplex duplex) {
       m_speed = speed;
       m_duplex = duplex;
+
+      m_board->Apply(*this);
     }
 
     void Port::SetAdminMode(State state) {
       m_state = state;
+      m_board->Apply(*this);
     }
 
     void Port::Add(const Ids& ports) {
@@ -56,6 +62,8 @@ namespace hal {
       for (auto p : m_to_ports) {
         std::cerr << __PRETTY_FUNCTION__ << " == : " << p->m_physic_port << '\n';
       }
+
+      m_board->Apply(*this);
     }
 
     void Port::Sub(const Ids& ports) {
@@ -71,6 +79,8 @@ namespace hal {
       for (auto p : m_to_ports) {
         std::cerr << __PRETTY_FUNCTION__ << " == : " << p->m_physic_port << '\n';
       }
+
+      m_board->Apply(*this);
     }
 
     Ids Port::Get() const {

@@ -1,10 +1,10 @@
 #ifndef COMMON_H__
 #define COMMON_H__
 
+#include "rc.h"
+
 #include <type_traits>
 #include <memory>
-
-#include "rc.h"
 
 namespace {
   template <typename T>

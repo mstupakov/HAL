@@ -14,8 +14,13 @@ namespace hal {
         std::cerr << __PRETTY_FUNCTION__ << '\n';
       }
 
-      void Init(const Topology &t) {}
-      void Apply(port::Port) {}
+      void Init(const Topology &t) {
+        std::cerr << __PRETTY_FUNCTION__ << '\n';
+      }
+
+      void Apply(port::Port) {
+        std::cerr << __PRETTY_FUNCTION__ << '\n';
+      }
   };
 }
 
