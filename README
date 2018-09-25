@@ -1,0 +1,15 @@
+HAL library.
+
+To build:
+  1) make all
+
+To integrate:
+  1) make all
+  2) Update your build system with 
+       Compilation: HAL := {absolute path to HAL}
+                    include ${HAL}/hal.mk
+                    g++ ${EXPORT_DIR} yours.cpp ...
+
+       Link:        g++ yours.o ... ${LD_FLAGS} 
+
+For more detailes please see example/main.cpp

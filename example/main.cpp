@@ -55,6 +55,8 @@ int main(int argc, char *argv[]) {
     p1->SetAdminMode(state);
 
     std::cerr << *p0 << '\n';
+    std::cerr << p0->GetStatistics();
+
     auto p10 = ports->GetPort(10);
   } catch (hal::Exception &e) {
     std::cerr << "Error: " << e.what() << '\n';

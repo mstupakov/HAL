@@ -19,11 +19,9 @@ namespace hal {
       }
 
       void Init() {
-        GBoardImp<Stub>::Init({ {1, 1},
-                                {2, 2},
-                                {3, 3},
-                                {4, 4},
-                                {5, 5}
+        GBoardImp<Stub>::Init({ {0, 0}, {1, 1},
+                                {2, 2}, {3, 3},
+                                {4, 4}, {5, 5},
         });
       }
     };

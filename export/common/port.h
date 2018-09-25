@@ -41,6 +41,43 @@ namespace hal {
       E_SPEED_AUTO
     };
 
+    struct MacStats {
+      uint64_t rx_good_octets;
+      uint64_t rx_bad_octets;
+
+      uint64_t rx_good_pkts;
+      uint64_t rx_bad_pkts;
+      uint64_t rx_good_bc_pkts;
+      uint64_t rx_good_mc_pkts;
+      uint64_t rx_good_fc_pkts;
+      uint64_t rx_good_uc_pkts;
+
+      uint64_t rx_error_mac_pkts;
+      uint64_t rx_undersize_pkts;
+      uint64_t rx_oversize_pkts;
+      uint64_t rx_jabber_pkts;
+      uint64_t rx_fragments_pkts;
+
+      uint64_t total_64_pkts;
+      uint64_t total_65_127_pkts;
+      uint64_t total_128_255_pkts;
+      uint64_t total_256_511_pkts;
+      uint64_t total_512_1023_pkts;
+      uint64_t total_1024_1518_pkts;
+      uint64_t total_1519_max_pkts;
+      uint64_t total_drop_pkts;
+
+      uint64_t tx_error_mac_pkts;
+      uint64_t tx_collision_mac_pkts;
+
+      uint64_t tx_good_octets;
+      uint64_t tx_good_pkts;
+      uint64_t tx_good_mc_pkts;
+      uint64_t tx_good_bc_pkts;
+      uint64_t tx_good_fc_pkts;
+      uint64_t tx_good_uc_pkts;
+    };
+
     using Ids = std::set<std::shared_ptr<Port>>;
 
     using Notify =
@@ -55,6 +92,7 @@ namespace hal {
       Speed m_speed;
       Duplex m_duplex;
       State m_state;
+      MacStats m_statistics;
 
       unsigned m_logic_port;
       unsigned m_physic_port;
@@ -71,6 +109,9 @@ namespace hal {
 
         void SetSpeed(Speed, Duplex);
         void SetAdminMode(State);
+
+        MacStats GetStatistics() const;
+        void Flush();
 
         void Add(const Ids&);
         void Sub(const Ids&);
@@ -143,6 +184,58 @@ namespace hal {
       os << "\n\n";
 
       return os;
+    }
+
+    inline
+    std::ostream& operator<<(std::ostream &os, const MacStats &stats) {
+      std::stringstream ss;
+
+      ss << "=== Rx:";
+
+      ss << "\n  - Bytes good         : " << stats.rx_good_octets;
+      ss << "\n  - Bytes bad          : " << stats.rx_bad_octets;
+
+      ss << "\n  - Frams good         : " << stats.rx_good_pkts;
+      ss << "\n  - Frams bad          : " << stats.rx_bad_pkts;
+
+      ss << "\n  - Unicast            : " << stats.rx_good_uc_pkts;
+      ss << "\n  - Multicast          : " << stats.rx_good_mc_pkts;
+      ss << "\n  - Broadcast          : " << stats.rx_good_bc_pkts;
+      ss << "\n  - Flow ctrl          : " << stats.rx_good_fc_pkts;
+
+      ss << "\n  - Mac error          : " << stats.rx_error_mac_pkts;
+
+      ss << "\n  - Undersized         : " << stats.rx_undersize_pkts;
+      ss << "\n  - Oversized          : " << stats.rx_oversize_pkts;
+      ss << "\n  - Jabber             : " << stats.rx_jabber_pkts;
+      ss << "\n  - Fragmets           : " << stats.rx_fragments_pkts;
+
+      ss << "\n\n=== Tx:";
+
+      ss << "\n  - Bytes good         : " << stats.tx_good_octets;
+      ss << "\n  - Frames good        : " << stats.tx_good_pkts;
+
+      ss << "\n  - Unicast            : " << stats.tx_good_uc_pkts;
+      ss << "\n  - Multicast          : " << stats.tx_good_mc_pkts;
+      ss << "\n  - Broadcast          : " << stats.tx_good_bc_pkts;
+      ss << "\n  - Flow ctrl          : " << stats.tx_good_fc_pkts;
+
+      ss << "\n  - Mac error          : " << stats.tx_error_mac_pkts;
+      ss << "\n  - Mac collision      : " << stats.tx_collision_mac_pkts;
+
+      ss << "\n\n=== Total:";
+      ss << "\n  - Octets under 64    : " << stats.total_64_pkts;
+      ss << "\n  - Octets over 1518   : " << stats.total_1519_max_pkts;
+      ss << "\n  - Dropped            : " << stats.total_drop_pkts;
+
+      ss << "\n  - Octets 65 - 127    : " << stats.total_65_127_pkts;
+      ss << "\n  - Octets 128 - 255   : " << stats.total_128_255_pkts;
+      ss << "\n  - Octets 256 - 511   : " << stats.total_256_511_pkts;
+      ss << "\n  - Octets 512 - 1023  : " << stats.total_512_1023_pkts;
+      ss << "\n  - Octets 1024 - 1518 : " << stats.total_1024_1518_pkts;
+      ss << "\n\n";
+
+      return os << ss.str();
     }
   }
 }

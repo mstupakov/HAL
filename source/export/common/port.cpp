@@ -15,7 +15,8 @@ namespace hal {
       : m_board(board),
         m_speed(Speed::E_SPEED_100M),
         m_duplex(Duplex::E_DUPLEX_FULL),
-        m_state(State::E_UP) {
+        m_state(State::E_UP),
+        m_statistics() {
 
       m_physic_port = physic_port;
       m_logic_port = logic_port;
@@ -47,6 +48,14 @@ namespace hal {
     void Port::SetAdminMode(State state) {
       m_state = state;
       m_board->Apply(*this);
+    }
+
+    MacStats Port::GetStatistics() const {
+      return m_statistics;
+    }
+
+    void Port::Flush() {
+      m_statistics = {};
     }
 
     void Port::Add(const Ids& ports) {
