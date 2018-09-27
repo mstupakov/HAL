@@ -12,45 +12,46 @@ namespace hal {
 
     Port::Port(GBoard *board,
         unsigned physic_port, unsigned logic_port)
-      : m_board(board),
-        m_speed(Speed::E_SPEED_100M),
-        m_duplex(Duplex::E_DUPLEX_FULL),
-        m_state(State::E_UP),
-        m_statistics() {
+      : m_board(board), m_statistics(), m_cfg_cur(),
+        m_cfg_new(), m_opr_cur(), m_opr_old() {
 
       m_physic_port = physic_port;
       m_logic_port = logic_port;
     }
 
     Port::operator unsigned() const {
-      return m_physic_port;
+      return m_logic_port;
     };
 
     unsigned Port::GetPhysicPort() const {
       return m_physic_port;
     }
 
-    unsigned Port::GetLogicPort() const {
-      return m_logic_port;
+    std::tuple<Speed, Duplex, State> Port::GetStatus() {
+      m_board->Get(*this);
+      return m_opr_cur;
     }
 
-    std::tuple<Speed, Duplex, State> Port::GetStatus() const {
-      return std::make_tuple(m_speed, m_duplex, m_state);
+    std::tuple<Speed, Duplex, State> Port::GetCfg() {
+      return m_cfg_cur;
     }
 
     void Port::SetSpeed(Speed speed, Duplex duplex) {
-      m_speed = speed;
-      m_duplex = duplex;
+      m_cfg_new = std::make_tuple(speed, duplex,
+          std::get<State>(m_cfg_cur));
 
       m_board->Apply(*this);
     }
 
     void Port::SetAdminMode(State state) {
-      m_state = state;
+      m_cfg_new = std::make_tuple(std::get<Speed>(m_cfg_cur),
+          std::get<Duplex>(m_cfg_cur), state);
+
       m_board->Apply(*this);
     }
 
-    MacStats Port::GetStatistics() const {
+    MacStats Port::GetStatistics() {
+      m_board->Get(*this);
       return m_statistics;
     }
 
@@ -60,7 +61,7 @@ namespace hal {
 
     void Port::Add(const Ids& ports) {
       for (auto p : ports) {
-        std::cerr << __PRETTY_FUNCTION__ << " ++ : " << p->m_physic_port << '\n';
+        std::clog << __PRETTY_FUNCTION__ << " ++ : " << p->m_physic_port << '\n';
       }
 
       Ids ids;
@@ -69,7 +70,7 @@ namespace hal {
       m_to_ports = ids;
 
       for (auto p : m_to_ports) {
-        std::cerr << __PRETTY_FUNCTION__ << " == : " << p->m_physic_port << '\n';
+        std::clog << __PRETTY_FUNCTION__ << " == : " << p->m_physic_port << '\n';
       }
 
       m_board->Apply(*this);
@@ -77,7 +78,7 @@ namespace hal {
 
     void Port::Sub(const Ids& ports) {
       for (auto p : ports) {
-        std::cerr << __PRETTY_FUNCTION__ << " -- : " << p->m_physic_port << '\n';
+        std::clog << __PRETTY_FUNCTION__ << " -- : " << p->m_physic_port << '\n';
       }
 
       Ids ids;
@@ -86,7 +87,7 @@ namespace hal {
       m_to_ports = ids;
 
       for (auto p : m_to_ports) {
-        std::cerr << __PRETTY_FUNCTION__ << " == : " << p->m_physic_port << '\n';
+        std::clog << __PRETTY_FUNCTION__ << " == : " << p->m_physic_port << '\n';
       }
 
       m_board->Apply(*this);

@@ -4,6 +4,7 @@
 #include "gboard.h"
 #include "port.h"
 #include "topology.h"
+#include "accessor.h"
 
 #include <iostream>
 
@@ -11,15 +12,21 @@ namespace hal {
   class Stub {
     public:
       Stub(GBoard*) {
-        std::cerr << __PRETTY_FUNCTION__ << '\n';
+        std::clog << __PRETTY_FUNCTION__ << '\n';
       }
 
-      void Init(const Topology &t) {
-        std::cerr << __PRETTY_FUNCTION__ << '\n';
+      void Init(const Topology&) {
+        std::clog << __PRETTY_FUNCTION__ << '\n';
       }
 
-      void Apply(port::Port) {
-        std::cerr << __PRETTY_FUNCTION__ << '\n';
+      void Apply(port::Port &port) {
+        std::clog << __PRETTY_FUNCTION__ << '\n';
+        PAccessor(port).cfg_cur() = PAccessor(port).cfg_new();
+      }
+
+      void Get(port::Port &port) {
+        std::clog << __PRETTY_FUNCTION__ << '\n';
+        PAccessor(port).opr_cur() = PAccessor(port).cfg_cur();
       }
   };
 }

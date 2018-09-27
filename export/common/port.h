@@ -4,6 +4,7 @@
 #include "common.h"
 
 #include <list>
+#include <tuple>
 #include <functional>
 #include <iostream>
 #include <sstream>
@@ -11,6 +12,8 @@
 #include <set>
 
 namespace hal {
+  struct PAccessor;
+
   namespace port {
     struct Port;
 
@@ -84,15 +87,18 @@ namespace hal {
       std::function<void(Event, const Ids&)>;
 
     class Port {
-      friend GBoard;
+      friend PAccessor;
+
       GBoard *m_board;
 
       Ids m_to_ports;
-
-      Speed m_speed;
-      Duplex m_duplex;
-      State m_state;
       MacStats m_statistics;
+
+      std::tuple<Speed, Duplex, State> m_cfg_cur;
+      std::tuple<Speed, Duplex, State> m_cfg_new;
+
+      std::tuple<Speed, Duplex, State> m_opr_cur;
+      std::tuple<Speed, Duplex, State> m_opr_old;
 
       unsigned m_logic_port;
       unsigned m_physic_port;
@@ -103,14 +109,14 @@ namespace hal {
         operator unsigned() const;
 
         unsigned GetPhysicPort() const;
-        unsigned GetLogicPort() const;
 
-        std::tuple<Speed, Duplex, State> GetStatus() const;
+        std::tuple<Speed, Duplex, State> GetStatus();
+        std::tuple<Speed, Duplex, State> GetCfg();
 
         void SetSpeed(Speed, Duplex);
         void SetAdminMode(State);
 
-        MacStats GetStatistics() const;
+        MacStats GetStatistics();
         void Flush();
 
         void Add(const Ids&);
@@ -165,38 +171,45 @@ namespace hal {
     }
 
     inline
-    std::ostream& operator<<(std::ostream &os, const Port &p) {
-      auto [speed, duplex, state] = p.GetStatus();
+    std::ostream& operator<<(std::ostream &os, Port &p) {
+      Speed speed; Duplex duplex; State state;
+      std::tie(speed, duplex, state) = p.GetStatus();
+
+      Speed cfg_speed; Duplex cfg_duplex; State cfg_state;
+      std::tie(cfg_speed, cfg_duplex, cfg_state) = p.GetCfg();
+
       std::string ports;
 
       for (auto to : p.Get()) {
         ports += " " + std::to_string(to->GetPhysicPort()) + " ";
       }
 
-      os << "\n ===- Port -===";
-      os << "\n  - physic : " << p.GetPhysicPort();
-      os << "\n  - logic  : " << p.GetLogicPort();
-      os << "\n  - speed  : " << speed;
-      os << "\n  - duplex : " << duplex;
-      os << "\n  - state  : " << state;
+      std::stringstream ss;
+      ss << "\n ===- Port -===";
+      ss << "\n  - physic : " << p.GetPhysicPort();
+      ss << "\n  - logic  : " << static_cast<unsigned>(p);
+      ss << "\n  - speed  : " << speed;
+      ss << "\n  - duplex : " << duplex;
+      ss << "\n  - link   : " << state;
+      ss << "\n  - admin  : " << cfg_state;
 
-      os << "\n to {" << ports << "}";
-      os << "\n\n";
+      ss << "\n to {" << ports << "}";
+      ss << "\n\n";
 
-      return os;
+      return os << ss.str();
     }
 
     inline
     std::ostream& operator<<(std::ostream &os, const MacStats &stats) {
       std::stringstream ss;
 
-      ss << "=== Rx:";
+      ss << "\n=== Rx:";
 
       ss << "\n  - Bytes good         : " << stats.rx_good_octets;
       ss << "\n  - Bytes bad          : " << stats.rx_bad_octets;
 
-      ss << "\n  - Frams good         : " << stats.rx_good_pkts;
-      ss << "\n  - Frams bad          : " << stats.rx_bad_pkts;
+      ss << "\n  - Frames good        : " << stats.rx_good_pkts;
+      ss << "\n  - Frames bad         : " << stats.rx_bad_pkts;
 
       ss << "\n  - Unicast            : " << stats.rx_good_uc_pkts;
       ss << "\n  - Multicast          : " << stats.rx_good_mc_pkts;

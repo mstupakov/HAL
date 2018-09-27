@@ -1,19 +1,20 @@
 BASE_DIR := ${CURDIR}
-TEMP_DIR := ${BASE_DIR}/temp
+TARG_DIR := build-$(notdir ${CROSS_COMPILE})
+TEMP_DIR := ${BASE_DIR}/temp/$(TARG_DIR:-=)
 PACK_DIR := ${BASE_DIR}/packages
 
-sdk: sdk_untar
+${TEMP_DIR}/sdk: ${TEMP_DIR}/sdk_untar
 	${BASE_DIR}/build.sh build
 
-sdk_untar:
+${TEMP_DIR}/sdk_untar:
 	mkdir -p ${TEMP_DIR}
 	cp -rf ${PACK_DIR}/* ${TEMP_DIR}/
-	touch sdk_untar
+	touch $@
 
 clean:
 	@[ -d ${TEMP_DIR} ] && ${BASE_DIR}/build.sh clean ||:
 
 cleanall: clean
-	-rm -rf ${TEMP_DIR} ${BASE_DIR}/sdk_untar
+	-rm -rf ${BASE_DIR}/temp
 
 .PHONY: sdk clean cleanall

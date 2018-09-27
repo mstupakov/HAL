@@ -1,4 +1,4 @@
-all
+output/
 *.o
 *.a
 *.d

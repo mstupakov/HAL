@@ -1,5 +1,6 @@
 #include <iostream>
 #include <list>
+#include <algorithm>
 
 #include "common.h"
 #include "iport.h"
@@ -9,7 +10,7 @@
 namespace hal {
   IPort::IPort(std::shared_ptr<GBoard> board)
     :  m_board(board) {
-    std::cerr << __PRETTY_FUNCTION__ << '\n';
+    std::clog << __PRETTY_FUNCTION__ << '\n';
     m_board->Subscribe([this](port::Event e, const port::Ids &ports) {
       if (e == port::Event::E_CREATE) {
         std::for_each(std::begin(ports), std::end(ports),
