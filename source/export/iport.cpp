@@ -35,11 +35,19 @@ namespace hal {
                     + std::to_string(port));
   }
 
-  decltype(IPort::m_ports)::iterator IPort::begin() {
+  IPort::size_type IPort::size() const noexcept {
+    return m_ports.size();
+  }
+
+  IPort::size_type IPort::max_size() const noexcept {
+    return m_ports.max_size();
+  }
+
+  IPort::iterator IPort::begin() {
     return m_ports.begin();
   }
 
-  decltype(IPort::m_ports)::iterator IPort::end() {
+  IPort::iterator IPort::end() {
     return m_ports.end();
   }
 } /* hal */

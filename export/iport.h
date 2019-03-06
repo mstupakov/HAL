@@ -19,8 +19,15 @@ namespace hal {
       void Subscribe(port::Notify);
       std::shared_ptr<port::Port> GetPort(unsigned);
 
-      decltype(m_ports)::iterator begin();
-      decltype(m_ports)::iterator end();
+      using value_type = decltype(m_ports)::value_type;
+      using iterator   = decltype(m_ports)::iterator;
+      using size_type  = decltype(m_ports)::size_type;
+
+      size_type size() const noexcept;
+      size_type max_size() const noexcept;
+
+      iterator begin();
+      iterator end();
   };
 }
 
