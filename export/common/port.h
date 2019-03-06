@@ -9,6 +9,7 @@
 #include <iostream>
 #include <sstream>
 #include <memory>
+#include <mutex>
 #include <set>
 
 namespace hal {
@@ -90,9 +91,10 @@ namespace hal {
       friend PAccessor;
 
       GBoard *m_board;
+      mutable std::recursive_mutex m_lock;
 
-      Ids m_to_ports;
-      MacStats m_statistics;
+      Ids m_to_ports = {};
+      MacStats m_statistics = {};
 
       std::tuple<Speed, Duplex, State> m_cfg_cur;
       std::tuple<Speed, Duplex, State> m_cfg_new;
@@ -123,6 +125,8 @@ namespace hal {
         void Sub(const Ids&);
         Ids Get() const;
     };
+
+    std::ostream& operator<<(std::ostream&, Port&);
 
     inline
     std::ostream& operator<<(std::ostream &os, const State &s) {
@@ -171,30 +175,15 @@ namespace hal {
     }
 
     inline
-    std::ostream& operator<<(std::ostream &os, Port &p) {
-      Speed speed; Duplex duplex; State state;
-      std::tie(speed, duplex, state) = p.GetStatus();
-
-      Speed cfg_speed; Duplex cfg_duplex; State cfg_state;
-      std::tie(cfg_speed, cfg_duplex, cfg_state) = p.GetCfg();
-
+    std::ostream& operator<<(std::ostream &os, Ids &ids) {
       std::string ports;
 
-      for (auto to : p.Get()) {
-        ports += " " + std::to_string(to->GetPhysicPort()) + " ";
+      for (auto &p : ids) {
+        ports += " " + std::to_string(p->GetPhysicPort()) + " ";
       }
 
       std::stringstream ss;
-      ss << "\n ===- Port -===";
-      ss << "\n  - physic : " << p.GetPhysicPort();
-      ss << "\n  - logic  : " << static_cast<unsigned>(p);
-      ss << "\n  - speed  : " << speed;
-      ss << "\n  - duplex : " << duplex;
-      ss << "\n  - link   : " << state;
-      ss << "\n  - admin  : " << cfg_state;
-
-      ss << "\n to {" << ports << "}";
-      ss << "\n\n";
+      ss << "\n {" << ports << "}\n";
 
       return os << ss.str();
     }

@@ -35,8 +35,10 @@ namespace hal {
       m_switch.Init(t);
 
       for (auto p : t) {
-        m_ports[p.logic_port] = std::make_shared<port::Port>(
-            PAccessor::Create(this, p.physic_port, p.logic_port));
+        m_ports[p.logic_port] =
+            PAccessor::Create(this, p.physic_port, p.logic_port);
+
+        Apply(*m_ports[p.logic_port]);
       }
 
       for (auto p : m_ports) {
@@ -56,25 +58,30 @@ namespace hal {
       m_port_notify.push_back(notify);
     }
 
+    void Update(port::Port &port) {
+      m_switch.Update(port);
+    }
+
     protected:
       void Update() {
         for (auto pair : m_ports) {
-          auto port = *pair.second;
+          auto &port = *pair.second;
           PAccessor p(port);
-          p.opr_old() = p.opr_cur();
 
-          Get(port);
+          std::lock_guard<std::recursive_mutex> lock(p.lock());
+          Update(port);
 
           if (p.opr_cur() != p.opr_old()) {
             p.opr_old() = p.opr_cur();
+            std::clog << __PRETTY_FUNCTION__ << ": " << port << '\n';
             Notify(port::Event::E_LINK_CHANGE, *m_ports[p.logic()]);
           }
         }
       }
 
-      void Notify(port::Event e, port::Port p) {
+      void Notify(port::Event e, port::Port &p) {
         std::for_each(std::begin(m_port_notify), std::end(m_port_notify),
-            [e, p, this](auto &&f) {
+            [e, &p, this](auto &&f) {
                 f(e, {this->m_ports.at(PAccessor(p).logic())});
             });
       }

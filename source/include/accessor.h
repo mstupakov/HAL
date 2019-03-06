@@ -12,9 +12,14 @@ namespace hal {
     PAccessor(const port::Port& port)
       : m_port(const_cast<port::Port&> (port)) {}
 
-    static port::Port Create(GBoard *b,
+    static std::shared_ptr<port::Port> Create(GBoard *b,
         unsigned physic_port, unsigned logic_port) {
-      return port::Port(b, physic_port, logic_port);
+      return std::shared_ptr<port::Port>(
+          new port::Port(b, physic_port, logic_port));
+    }
+
+    decltype(m_port.m_lock)& lock() {
+      return m_port.m_lock;
     }
 
     decltype(m_port.m_cfg_cur)& cfg_cur() {
@@ -39,6 +44,10 @@ namespace hal {
 
     decltype(m_port.m_logic_port)& logic() {
       return m_port.m_logic_port;
+    }
+
+    decltype(m_port.m_physic_port)& physic() {
+      return m_port.m_physic_port;
     }
 
     decltype(m_port.m_to_ports)& to_ports() {

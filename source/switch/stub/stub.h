@@ -25,8 +25,18 @@ namespace hal {
       }
 
       void Get(port::Port &port) {
-        std::clog << __PRETTY_FUNCTION__ << '\n';
         PAccessor(port).opr_cur() = PAccessor(port).cfg_cur();
+      }
+
+      void Update(port::Port &port) {
+        PAccessor(port).opr_cur() = PAccessor(port).cfg_cur();
+
+        PAccessor(port).stats().rx_good_octets       += 1;
+        PAccessor(port).stats().tx_good_octets       += 5;
+        PAccessor(port).stats().total_64_pkts        += 7;
+        PAccessor(port).stats().rx_good_uc_pkts      += 8;
+        PAccessor(port).stats().tx_good_uc_pkts      += 9;
+        PAccessor(port).stats().total_1024_1518_pkts += 5;
       }
   };
 }
